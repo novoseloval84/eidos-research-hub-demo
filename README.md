@@ -72,24 +72,24 @@ idos-research-hub-demo/
  src/
 app/
 api/
-   chat/
-      route.ts # Chat API endpoint
-      research/
-      assistant/
-          route.ts # Research Assistant API
-    globals.css # Global styles
-    layout.tsx # Root layout
-      page.tsx # Home page
-    components/
-      ResearchAssistant.tsx # Main component
-      Navbar.tsx # Navigation
-      Hero.tsx # Hero section
-      Capabilities.tsx # Features
-         Footer.tsx # Footer
-     lib/ # Utility functions
-     public/
-         favicon.ico # Site icon
-         robots.txt # SEO configuration
+chat/
+-    route.ts # Chat API endpoint
+-      research/
+-      assistant/
+-          route.ts # Research Assistant API
+-    globals.css # Global styles
+-    layout.tsx # Root layout
+-      page.tsx # Home page
+-    components/
+-      ResearchAssistant.tsx # Main component
+-      Navbar.tsx # Navigation
+-      Hero.tsx # Hero section
+-      Capabilities.tsx # Features
+-         Footer.tsx # Footer
+-     lib/ # Utility functions
+-     public/
+-         favicon.ico # Site icon
+-         robots.txt # SEO configuration
 package.json # Dependencies
 tailwind.config.ts # Tailwind configuration
 tsconfig.json # TypeScript configuration
