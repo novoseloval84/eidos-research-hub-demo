@@ -50,51 +50,62 @@ Multi-agent expert analysis system with the ability to operate in demonstration 
 - 🎯 **Icons** - FontAwesome for all UI elements
 
 ## 🔧 Technology Stack
-Frontend:
-Next.js 14
-React 18
-TypeScript
-Tailwind CSS
-FontAwesome
 
-Backend:
-Next.js API Routes
-Node.js
-REST API
+### **Frontend:**
+- **Next.js 14** - React framework with App Router and Server Components
+- **React 18** - UI library with hooks and concurrent features
+- **TypeScript** - Static typing for better code quality
+- **Tailwind CSS** - Utility-first CSS framework
+- **FontAwesome** - Icon library for UI elements
 
-Additional:
-ESLint
-Prettier
-Responsive Design
+### **Backend:**
+- **Next.js API Routes** - Serverless API endpoints
+- **Node.js** - JavaScript runtime environment
+- **REST API** - Architectural style for web services
+
+### **Development Tools:**
+- **ESLint** - Code linting and quality checking
+- **Prettier** - Code formatting and consistency
+- **Responsive Design** - Mobile-first responsive layouts
+
+### **Deployment:**
+- **Vercel** - Hosting platform with CI/CD
+- **GitHub** - Version control and collaboration
 
 ## 📁 Project Structure
-idos-research-hub-demo/
- src/
-app/
-api/
-chat/
--    route.ts # Chat API endpoint
--      research/
--      assistant/
--          route.ts # Research Assistant API
--    globals.css # Global styles
--    layout.tsx # Root layout
--      page.tsx # Home page
--    components/
--      ResearchAssistant.tsx # Main component
--      Navbar.tsx # Navigation
--      Hero.tsx # Hero section
--      Capabilities.tsx # Features
--         Footer.tsx # Footer
--     lib/ # Utility functions
--     public/
--         favicon.ico # Site icon
--         robots.txt # SEO configuration
-package.json # Dependencies
-tailwind.config.ts # Tailwind configuration
-tsconfig.json # TypeScript configuration
-next.config.js # Next.js configuration
-README.md # This file
+
+### **File Descriptions:**
+
+#### **API Routes:**
+- `src/app/api/chat/route.ts` - Handles chat functionality endpoints
+- `src/app/api/research/assistant/route.ts` - Multi-agent research assistant API
+
+#### **App Components:**
+- `src/app/globals.css` - Global CSS styles and Tailwind directives
+- `src/app/layout.tsx` - Root layout component with metadata
+- `src/app/page.tsx` - Main home page component
+
+#### **UI Components:**
+- `src/components/ResearchAssistant.tsx` - Multi-agent AI research assistant interface
+- `src/components/Navbar.tsx` - Navigation header component
+- `src/components/Hero.tsx` - Hero/landing section component
+- `src/components/Capabilities.tsx` - Features and capabilities showcase
+- `src/components/Footer.tsx` - Footer component with links and information
+
+#### **Configuration Files:**
+- `package.json` - Project dependencies, scripts, and metadata
+- `tailwind.config.ts` - Tailwind CSS theme and plugin configuration
+- `tsconfig.json` - TypeScript compiler options
+- `next.config.js` - Next.js framework configuration
+- `.env.local` - Environment variables (not in repo)
+
+#### **Static Assets:**
+- `public/favicon.ico` - Website favicon
+- `public/robots.txt` - Search engine optimization configuration
+
+#### **Documentation:**
+- `README.md` - Project documentation (this file)
+- `LICENSE` - MIT License file
 
 ## 🚀 Live Demo
 
