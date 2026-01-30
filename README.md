@@ -1,5 +1,3 @@
-# Создайте README.md одной командой
-cat > README.md << 'EOF'
 # 🤖 AI Research Assistant - Eidos Research Hub
 
 ## 🎯 Project Description
