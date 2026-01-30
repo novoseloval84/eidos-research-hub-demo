@@ -51,50 +51,50 @@ Multi-agent expert analysis system with the ability to operate in demonstration 
 
 ## 🔧 Technology Stack
 Frontend:
-├── Next.js 14
-├── React 18
-├── TypeScript
-├── Tailwind CSS
-└── FontAwesome
+Next.js 14
+React 18
+TypeScript
+Tailwind CSS
+FontAwesome
 
 Backend:
-├── Next.js API Routes
-├── Node.js
-└── REST API
+Next.js API Routes
+Node.js
+REST API
 
 Additional:
-├── ESLint
-├── Prettier
-└── Responsive Design
+ESLint
+Prettier
+Responsive Design
 
 ## 📁 Project Structure
 idos-research-hub-demo/
-├── src/
-│ ├── app/
-│ │ ├── api/
-│ │ │ ├── chat/
-│ │ │ │ └── route.ts # Chat API endpoint
-│ │ │ └── research/
-│ │ │ └── assistant/
-│ │ │ └── route.ts # Research Assistant API
-│ │ ├── globals.css # Global styles
-│ │ ├── layout.tsx # Root layout
-│ │ └── page.tsx # Home page
-│ ├── components/
-│ │ ├── ResearchAssistant.tsx # Main component
-│ │ ├── Navbar.tsx # Navigation
-│ │ ├── Hero.tsx # Hero section
-│ │ ├── Capabilities.tsx # Features
-│ │ └── Footer.tsx # Footer
-│ └── lib/ # Utility functions
-├── public/
-│ ├── favicon.ico # Site icon
-│ └── robots.txt # SEO configuration
-├── package.json # Dependencies
-├── tailwind.config.ts # Tailwind configuration
-├── tsconfig.json # TypeScript configuration
-├── next.config.js # Next.js configuration
-└── README.md # This file
+ src/
+app/
+api/
+   chat/
+      route.ts # Chat API endpoint
+      research/
+      assistant/
+          route.ts # Research Assistant API
+    globals.css # Global styles
+    layout.tsx # Root layout
+      page.tsx # Home page
+    components/
+      ResearchAssistant.tsx # Main component
+      Navbar.tsx # Navigation
+      Hero.tsx # Hero section
+      Capabilities.tsx # Features
+         Footer.tsx # Footer
+     lib/ # Utility functions
+     public/
+         favicon.ico # Site icon
+         robots.txt # SEO configuration
+package.json # Dependencies
+tailwind.config.ts # Tailwind configuration
+tsconfig.json # TypeScript configuration
+next.config.js # Next.js configuration
+README.md # This file
 
 ## 🚀 Live Demo
 
