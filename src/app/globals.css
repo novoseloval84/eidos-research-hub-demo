@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --dna-purple: #8B5CF6;
+  --med-blue: #3B82F6;
+  --lab-green: #10B981;
+  --cell-yellow: #F59E0B;
+  --research-teal: #06B6D4;
+  --ai-pink: #EC4899;
+  --white: #FFFFFF;
+  --light-bg: #F8FAFC;
+  --gray-light: #E2E8F0;
+  --gray-dark: #64748B;
+}
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-[#F8FAFC] to-[#F1F5F9] text-gray-900 min-h-screen;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-dna-purple via-ai-pink to-med-blue bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient;
+  }
+  
+  .card-gradient {
+    @apply bg-gradient-to-br from-dna-purple/5 to-ai-pink/5;
+  }
+  
+  .button-gradient {
+    @apply bg-gradient-to-r from-dna-purple to-ai-pink;
+  }
+  
+  .green-gradient {
+    @apply bg-gradient-to-r from-lab-green to-research-teal;
+  }
+}
