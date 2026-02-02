@@ -311,6 +311,10 @@ function generateTestResponse(expertType: string, query: string) {
 export async function POST(request: NextRequest) {
   console.log('=== Research Assistant API Called ===');
   
+  // Объявим переменные вне try блока, чтобы они были доступны в catch
+  let query = '';
+  let expertType = 'multi-domain';
+  
   try {
     const body = await request.json();
     console.log('Request body:', { 
@@ -319,7 +323,9 @@ export async function POST(request: NextRequest) {
       testMode: body.testMode
     });
 
-    const { query, expertType = 'multi-domain', testMode = false } = body;
+    query = body.query || '';
+    expertType = body.expertType || 'multi-domain';
+    const testMode = body.testMode || false;
     
     if (!query) {
       return NextResponse.json(
@@ -376,6 +382,7 @@ export async function POST(request: NextRequest) {
     console.error('Fatal error:', error);
     
     // On fatal error return simple test response
+    // Теперь query доступна, потому что объявлена вне try блока
     const simpleResponse = `📊 **DEMONSTRATION RESPONSE**\n\nSystem is running in demonstration mode.\n\n**Question:** ${query?.substring(0, 100) || 'Not specified'}\n\n**Key recommendations:**\n1. Start with pilot study\n2. Test multiple approaches\n3. Collect feedback\n\n**Next steps:**\n• Configure API keys for real analysis\n• Study documentation\n• Test different expert systems`;
     
     return NextResponse.json({
@@ -398,7 +405,7 @@ export async function POST(request: NextRequest) {
         ]
       }],
       timestamp: new Date().toISOString(),
-      mode: 'multi-domain',
+      mode: expertType,
       demoMode: true,
       warning: '⚠️ System error. Emergency demo mode is used.',
       info: 'Service is running in limited demonstration mode.'
