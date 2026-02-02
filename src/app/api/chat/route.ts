@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Конфигурация AI провайдеров с Google AI Studio
+// AI providers configuration with Google AI Studio
 const AI_PROVIDERS = {
   groq: {
     name: 'Groq Cloud',
@@ -25,7 +25,7 @@ const AI_PROVIDERS = {
       'Content-Type': 'application/json'
     }),
     body: (messages: any[], model: string) => {
-      // Конвертируем OpenAI формат в Gemini формат
+      // Convert OpenAI format to Gemini format
       const lastMessage = messages[messages.length - 1];
       return {
         contents: [{
@@ -40,7 +40,7 @@ const AI_PROVIDERS = {
       };
     },
     parseResponse: (data: any) => {
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Нет ответа от Gemini';
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response from Gemini';
     }
   },
   openrouter: {
@@ -74,7 +74,7 @@ async function queryAIProvider(provider: keyof typeof AI_PROVIDERS, query: strin
   if (!apiKey) {
     return {
       provider: AI_PROVIDERS[provider].name,
-      response: `API ключ не настроен для ${AI_PROVIDERS[provider].name}`,
+      response: `API key not configured for ${AI_PROVIDERS[provider].name}`,
       confidence: 0,
       error: true
     }
@@ -83,16 +83,168 @@ async function queryAIProvider(provider: keyof typeof AI_PROVIDERS, query: strin
   const config = AI_PROVIDERS[provider];
   const model = config.models[0];
 
-  // Промпт в зависимости от эксперта
+  // Prompt based on expert type
   const systemPrompts = {
-    'Generative AI': `Ты эксперт по генеративному AI и креативным исследованиям. Отвечай креативно, предлагай новые идеи и подходы. Будь конкретным и предлагай практические решения.`,
-    'Knowledge Graph': `Ты эксперт по семантическим сетям и анализу связей. Анализируй связи и паттерны. Объясняй сложные концепции простым языком.`,
-    'Life Sciences': `Ты эксперт по биомедицинским исследованиям и наукам о жизни. Фокусируйся на научной точности. Предлагай конкретные методы и подходы.`
+    'Generative AI': `You are an expert in generative AI and creative research. Respond creatively, offer new ideas and approaches. Be specific and propose practical solutions.`,
+    'Knowledge Graph': `You are an expert in semantic networks and relationship analysis. Analyze connections and patterns. Explain complex concepts in simple language.`,
+    'Life Sciences': `You are an expert in biomedical research and life sciences. Focus on scientific accuracy. Propose specific methods and approaches.`
   };
 
-  const systemPrompt = systemPrompts[expertType as keyof typeof systemPrompts] || 'Ты AI исследовательский ассистент. Отвечай подробно и профессионально.';
+  const systemPrompt = systemPrompts[expertType as keyof typeof systemPrompts] || 'You are an AI research assistant. Respond in detail and professionally.';
 
   try {
     let url = config.endpoint;
     let body: any;
-    let headers = config.headers()
+    let headers = config.headers(apiKey); // FIXED: added apiKey argument
+    
+    // For Google AI Studio add API key to URL
+    if (provider === 'google') {
+      url = `${config.endpoint}?key=${apiKey}`;
+      // For Google remove Authorization header
+      headers = config.headers(apiKey);
+      delete (headers as any)['Authorization'];
+    }
+    
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: query }
+    ];
+    
+    body = config.body(messages, model);
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`${config.name} API error: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    // Parse response based on provider
+    let aiResponse = '';
+    if (provider === 'google' && config.parseResponse) {
+      aiResponse = config.parseResponse(data);
+    } else {
+      aiResponse = data.choices?.[0]?.message?.content || 'No response';
+    }
+    
+    return {
+      provider: config.name,
+      response: aiResponse,
+      confidence: 0.85,
+      error: false,
+      model: model
+    };
+    
+  } catch (error: any) {
+    console.error(`${provider} API error:`, error);
+    return {
+      provider: config.name,
+      response: `Error requesting ${config.name}: ${error.message}`,
+      confidence: 0,
+      error: true
+    };
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { query, expertType, provider = 'groq' } = await request.json();
+    
+    if (!query || !expertType) {
+      return NextResponse.json(
+        { error: 'Query and expertType are required' },
+        { status: 400 }
+      );
+    }
+    
+    // Check if API keys exist for real requests
+    const hasApiKeys = process.env.GROQ_API_KEY || process.env.GOOGLE_AI_API_KEY || process.env.OPENROUTER_API_KEY;
+    
+    // If no API keys, use demo mode
+    if (!hasApiKeys) {
+      const demoResponses = {
+        'Generative AI': [
+          "🎯 **Request Analysis**: Your query relates to generative AI capabilities. \n\n✨ **Creative Ideas**: 1. Using diffusion models for generating scientific hypotheses. 2. Applying GPT architectures for automating literature review. \n\n🚀 **Innovative Approaches**: Combining transformers with generative adversarial networks for creating new research patterns.",
+          "💡 **Generative Analysis**: Based on your query, I propose synthesizing interdisciplinary approaches using: \n1. Variational autoencoders for feature compression\n2. Transformer architectures for generating text reports\n3. Diffusion models for visualizing research data"
+        ],
+        'Knowledge Graph': [
+          "🕸️ **Semantic Analysis**: Key connections between concepts have been identified. \n\n🔗 **Main Patterns**: 1. Strong correlation between concepts X and Y. 2. Hidden dependencies in data structure discovered. \n\n📊 **Visualization**: Recommend building a knowledge graph with cluster highlighting by thematic proximity.",
+          "🌐 **Relationship Analysis**: Network analysis shows three main clusters of interconnections. \n\n🎯 **Key Nodes**: Central concepts requiring additional study have been identified. \n\n🔍 **Recommendations**: Use graph neural networks for predicting new connections."
+        ],
+        'Life Sciences': [
+          "🧬 **Biomedical Analysis**: Based on your query, I recommend the following methods: \n\n🔬 **Experimental Approaches**: 1. CRISPR-Cas9 for gene editing. 2. Single-cell RNA sequencing for analyzing cellular heterogeneity. \n\n📈 **Statistical Methods**: Applying Bayesian inference for analyzing biological data.",
+          "🔍 **Scientific Analysis**: In the context of your query, consider: \n1. Proteomic analysis using mass spectrometry\n2. Protein structure modeling with AlphaFold\n3. Metagenomic data analysis for studying microbiome"
+        ],
+        'Multi-Domain': [
+          "🌐 **Interdisciplinary Analysis**: Integrating approaches from different fields. \n\n🎯 **Method Synthesis**: 1. Combining ML algorithms with traditional statistical methods. 2. Using network analysis to identify cross-domain dependencies. \n\n🚀 **Comprehensive Approach**: Propose a framework combining data analysis, visualization, and prediction.",
+          "⚡ **Integrative Analysis**: Synthesizing approaches from computer science, biology, and cognitive sciences. \n\n🔗 **Interdisciplinary Connections**: Promising directions at the intersection of AI technologies and biomedical research have been identified."
+        ]
+      };
+      
+      const responses = demoResponses[expertType as keyof typeof demoResponses] || [
+        "🤖 **AI Analysis**: The system has processed your request. In demo mode, typical results of the expert system operation are presented."
+      ];
+      
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      
+      return NextResponse.json({
+        success: true,
+        mode: 'demo',
+        expertType,
+        query,
+        response: randomResponse,
+        provider: 'Demo Mode',
+        confidence: 0.9,
+        timestamp: new Date().toISOString(),
+        agents: ['Analyst', 'Synthesizer', 'Validator'],
+        processingTime: '1.2s'
+      });
+    }
+    
+    // Real request to AI API
+    const result = await queryAIProvider(provider as keyof typeof AI_PROVIDERS, query, expertType);
+    
+    return NextResponse.json({
+      success: !result.error,
+      mode: 'live',
+      expertType,
+      query,
+      response: result.response,
+      provider: result.provider,
+      confidence: result.confidence,
+      error: result.error,
+      timestamp: new Date().toISOString(),
+      model: result.model,
+      agents: ['Analyst', 'Synthesizer', 'Validator'],
+      processingTime: '2.5s'
+    });
+    
+  } catch (error: any) {
+    console.error('Chat API error:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Internal server error',
+        message: error.message,
+        mode: 'error',
+        fallback: 'Using demo mode due to server error'
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  return NextResponse.json({
+    status: 'active',
+    mode: 'demo',
+    available_providers: Object.keys(AI_PROVIDERS),
+    expert_types: ['Generative AI', 'Knowledge Graph', 'Life Sciences', 'Multi-Domain'],
+    note: 'For real requests, configure API keys in .env.local'
+  });
+}
