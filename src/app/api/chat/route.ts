@@ -95,4 +95,4 @@ async function queryAIProvider(provider: keyof typeof AI_PROVIDERS, query: strin
   try {
     let url = config.endpoint;
     let body: any;
-    let headers = config.headers(
+    let headers = config.headers()
