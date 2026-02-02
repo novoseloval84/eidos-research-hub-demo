@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Define provider types
+interface AIProvider {
+  name: string;
+  endpoint: string;
+  models: string[];
+  headers: (apiKey: string) => Record<string, string>;
+  body: (messages: any[], model: string) => any;
+  parseResponse?: (data: any) => string; // Optional property
+}
+
 // AI providers configuration with Google AI Studio
-const AI_PROVIDERS = {
+const AI_PROVIDERS: Record<string, AIProvider> = {
   groq: {
     name: 'Groq Cloud',
     endpoint: 'https://api.groq.com/openai/v1/chat/completions',
@@ -84,25 +94,25 @@ async function queryAIProvider(provider: keyof typeof AI_PROVIDERS, query: strin
   const model = config.models[0];
 
   // Prompt based on expert type
-  const systemPrompts = {
+  const systemPrompts: Record<string, string> = {
     'Generative AI': `You are an expert in generative AI and creative research. Respond creatively, offer new ideas and approaches. Be specific and propose practical solutions.`,
     'Knowledge Graph': `You are an expert in semantic networks and relationship analysis. Analyze connections and patterns. Explain complex concepts in simple language.`,
     'Life Sciences': `You are an expert in biomedical research and life sciences. Focus on scientific accuracy. Propose specific methods and approaches.`
   };
 
-  const systemPrompt = systemPrompts[expertType as keyof typeof systemPrompts] || 'You are an AI research assistant. Respond in detail and professionally.';
+  const systemPrompt = systemPrompts[expertType] || 'You are an AI research assistant. Respond in detail and professionally.';
 
   try {
     let url = config.endpoint;
     let body: any;
-    let headers = config.headers(apiKey); // FIXED: added apiKey argument
+    let headers = config.headers(apiKey);
     
     // For Google AI Studio add API key to URL
     if (provider === 'google') {
       url = `${config.endpoint}?key=${apiKey}`;
       // For Google remove Authorization header
       headers = config.headers(apiKey);
-      delete (headers as any)['Authorization'];
+      delete headers['Authorization'];
     }
     
     const messages = [
@@ -167,7 +177,7 @@ export async function POST(request: NextRequest) {
     
     // If no API keys, use demo mode
     if (!hasApiKeys) {
-      const demoResponses = {
+      const demoResponses: Record<string, string[]> = {
         'Generative AI': [
           "🎯 **Request Analysis**: Your query relates to generative AI capabilities. \n\n✨ **Creative Ideas**: 1. Using diffusion models for generating scientific hypotheses. 2. Applying GPT architectures for automating literature review. \n\n🚀 **Innovative Approaches**: Combining transformers with generative adversarial networks for creating new research patterns.",
           "💡 **Generative Analysis**: Based on your query, I propose synthesizing interdisciplinary approaches using: \n1. Variational autoencoders for feature compression\n2. Transformer architectures for generating text reports\n3. Diffusion models for visualizing research data"
@@ -186,7 +196,7 @@ export async function POST(request: NextRequest) {
         ]
       };
       
-      const responses = demoResponses[expertType as keyof typeof demoResponses] || [
+      const responses = demoResponses[expertType] || [
         "🤖 **AI Analysis**: The system has processed your request. In demo mode, typical results of the expert system operation are presented."
       ];
       
